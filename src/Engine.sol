@@ -1,10 +1,42 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-/// Fixed-point arithmetic pieces for a Monte Carlo option engine.
+/// A Monte Carlo option engine that runs inside a view call.
 contract Engine {
     uint256 internal constant ONE = 1e18;
     uint256 internal constant PASSES = 5;
+
+    struct Spec {
+        uint256 spot;
+        uint256 strike;
+        uint256 var0;
+        uint16 steps;
+        uint16 paths;
+        uint256 seed;
+    }
+
+    error BadSpec();
+
+    /// Mean call payoff over the paths. Undiscounted.
+    function quote(Spec memory s) public pure returns (uint256 mean) {
+        if (s.paths == 0 || s.steps == 0 || s.spot == 0) revert BadSpec();
+        uint256 sd0 = root(s.var0);
+        uint256 sum;
+        for (uint256 p; p < s.paths; ++p) sum += path(s, p, sd0);
+        mean = sum / s.paths;
+    }
+
+    function path(Spec memory s, uint256 p, uint256 sd0) internal pure returns (uint256) {
+        uint256 sd = sd0;
+        uint256 v = s.var0;
+        int256 logS;
+        for (uint256 t; t < s.steps; ++t) {
+            int256 r = (int256(sd) * normal(s.seed, p, t)) / int256(ONE);
+            logS += r - int256(v / 2);
+        }
+        uint256 S = (s.spot * exp(logS)) / ONE;
+        return S > s.strike ? S - s.strike : 0;
+    }
 
     function root(uint256 x) internal pure returns (uint256 y) {
         if (x == 0) return 0;
@@ -21,7 +53,6 @@ contract Engine {
         for (uint256 i; i < PASSES; ++i) y = (y + n / y) >> 1;
     }
 
-    /// A standard normal from one hash: twelve 21-bit uniforms, summed and centred.
     function normal(uint256 seed, uint256 p, uint256 t) internal pure returns (int256 z) {
         assembly ("memory-safe") {
             mstore(0x00, seed)
@@ -39,7 +70,6 @@ contract Engine {
         }
     }
 
-    /// e to a 1e18 fixed-point power, argument-reduced.
     function exp(int256 x) internal pure returns (uint256) {
         if (x < -40e18) return 0;
         require(x <= 40e18, "exp overflow");
