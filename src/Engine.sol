@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-/// A Monte Carlo option engine that runs inside a view call.
+/// A Monte Carlo option engine whose variance feeds on itself (GARCH(1,1)).
 contract Engine {
     uint256 internal constant ONE = 1e18;
     uint256 internal constant PASSES = 5;
@@ -10,6 +10,9 @@ contract Engine {
         uint256 spot;
         uint256 strike;
         uint256 var0;
+        uint256 omega;
+        uint256 alpha;
+        uint256 beta;
         uint16 steps;
         uint16 paths;
         uint256 seed;
@@ -17,9 +20,9 @@ contract Engine {
 
     error BadSpec();
 
-    /// Mean call payoff over the paths. Undiscounted.
     function quote(Spec memory s) public pure returns (uint256 mean) {
         if (s.paths == 0 || s.steps == 0 || s.spot == 0) revert BadSpec();
+        if (s.alpha + s.beta >= ONE) revert BadSpec();
         uint256 sd0 = root(s.var0);
         uint256 sum;
         for (uint256 p; p < s.paths; ++p) sum += path(s, p, sd0);
@@ -33,6 +36,8 @@ contract Engine {
         for (uint256 t; t < s.steps; ++t) {
             int256 r = (int256(sd) * normal(s.seed, p, t)) / int256(ONE);
             logS += r - int256(v / 2);
+            v = s.omega + (s.alpha * uint256((r * r) / int256(ONE))) / ONE + (s.beta * v) / ONE;
+            sd = warmRoot(v, sd);
         }
         uint256 S = (s.spot * exp(logS)) / ONE;
         return S > s.strike ? S - s.strike : 0;
