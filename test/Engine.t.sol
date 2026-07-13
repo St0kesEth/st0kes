@@ -28,7 +28,7 @@ contract EngineTest is Test {
         string memory ref = vm.readFile("data/reference.json");
         uint256 exact = vm.parseJsonUint(ref, ".call100");
         uint256 sum;
-        for (uint256 k = 1; k <= 40; ++k) sum += e.quote(brownian(SPOT, 128, k));
+        for (uint256 k = 1; k <= 100; ++k) sum += e.quote(brownian(SPOT, 128, k));
         uint256 mean = sum / 40;
         uint256 gap = mean > exact ? mean - exact : exact - mean;
         assertLt(gap, exact / 10);
