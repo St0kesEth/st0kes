@@ -5,4 +5,6 @@ libs = ["lib"]
 solc = "0.8.26"
 optimizer = true
 optimizer_runs = 200
+via_ir = true
+gas_limit = 30000000000
 fs_permissions = [{ access = "read", path = "./data" }, { access = "read-write", path = "./web" }]
