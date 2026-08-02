@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-/// A Monte Carlo option engine whose variance feeds on itself (GARCH(1,1)).
+/// A Monte Carlo option engine that runs inside a view call and reports its
+/// own error.
 contract Engine {
     uint256 internal constant ONE = 1e18;
     uint256 internal constant PASSES = 5;
@@ -20,13 +21,23 @@ contract Engine {
 
     error BadSpec();
 
-    function quote(Spec memory s) public pure returns (uint256 mean) {
-        if (s.paths == 0 || s.steps == 0 || s.spot == 0) revert BadSpec();
+    function quote(Spec memory s) public pure returns (uint256 mean, uint256 se) {
+        if (s.paths < 2 || s.steps == 0 || s.spot == 0) revert BadSpec();
         if (s.alpha + s.beta >= ONE) revert BadSpec();
         uint256 sd0 = root(s.var0);
         uint256 sum;
-        for (uint256 p; p < s.paths; ++p) sum += path(s, p, sd0);
-        mean = sum / s.paths;
+        uint256 sq;
+        for (uint256 p; p < s.paths; ++p) {
+            uint256 pay = path(s, p, sd0);
+            sum += pay;
+            sq += pay * pay;
+        }
+        uint256 n = s.paths;
+        mean = sum / n;
+        uint256 m2 = mean * mean;
+        uint256 e2 = sq / n;
+        uint256 v = e2 > m2 ? ((e2 - m2) * n) / (n - 1) : 0;
+        se = isqrt(v / n);
     }
 
     function path(Spec memory s, uint256 p, uint256 sd0) internal pure returns (uint256) {
@@ -56,6 +67,13 @@ contract Engine {
         uint256 n = x * ONE;
         y = g == 0 ? x : g;
         for (uint256 i; i < PASSES; ++i) y = (y + n / y) >> 1;
+    }
+
+    function isqrt(uint256 x) internal pure returns (uint256 y) {
+        if (x == 0) return 0;
+        y = x;
+        uint256 k = (x >> 1) + 1;
+        while (k < y) { y = k; k = (x / k + k) >> 1; }
     }
 
     function normal(uint256 seed, uint256 p, uint256 t) internal pure returns (int256 z) {
