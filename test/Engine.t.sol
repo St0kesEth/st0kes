@@ -34,9 +34,11 @@ contract EngineTest is Test {
             sum += m; seSum += se;
         }
         uint256 mean = sum / 100;
-        uint256 seOfMean = (seSum / 100) / 10;
+        uint256 seAvg = seSum / 100;
+        uint256 seOfMean = seAvg / 10;
         uint256 gap = mean > exact ? mean - exact : exact - mean;
         assertLt(gap, 3 * seOfMean);
+        console.log("reported", seAvg);
     }
 
     function test_RejectsBadSpec() public {
