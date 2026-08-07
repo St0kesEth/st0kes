@@ -17,3 +17,7 @@ exactly.
 The natural contract for a chain to settle is one on the average price of a
 session. The average of a feed's own prints is what the feed already publishes.
 That option has no closed form, and it is next on the list.
+
+At 128 paths the standard error is a few percent of the price for a call, more
+for a put out of the money. A trader would want a thousand paths or more. The
+question is whether the node will run that inside a view call.
