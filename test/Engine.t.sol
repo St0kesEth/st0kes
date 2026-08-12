@@ -26,3 +26,15 @@ contract EngineTest is Test {
         assertEq(a, b); assertEq(sa, sb);
     }
 }
+
+    /// Same paths price the call and the put, so call minus put must equal
+    /// spot minus strike up to the noise the quote reports.
+    function test_AsianPutCallParity() public view {
+        (uint256 c, uint256 sc) = e.quote(bursty(Engine.Payoff.AsianCall, 101e18, 256, 7));
+        (uint256 p, uint256 sp) = e.quote(bursty(Engine.Payoff.AsianPut, 101e18, 256, 7));
+        int256 lhs = int256(c) - int256(p);
+        int256 rhs = int256(SPOT) - int256(101e18);
+        uint256 gap = uint256(lhs > rhs ? lhs - rhs : rhs - lhs);
+        assertLt(gap, 4 * (sc > sp ? sc : sp));
+    }
+}
