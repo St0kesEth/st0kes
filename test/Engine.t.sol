@@ -33,5 +33,12 @@ contract EngineTest is Test {
         int256 rhs = int256(SPOT) - int256(101e18);
         uint256 gap = uint256(lhs > rhs ? lhs - rhs : rhs - lhs);
         assertLt(gap, 4 * (sc > sp ? sc : sp));
+    
+
+    /// The average of a path moves less than its end, so the Asian call is cheaper.
+    function test_AsianCheaperThanVanilla() public view {
+        (uint256 a,) = e.quote(bursty(Engine.Payoff.AsianCall, SPOT, 512, 3));
+        (uint256 v,) = e.quote(bursty(Engine.Payoff.Call, SPOT, 512, 3));
+        assertLt(a, v);
     }
 }
