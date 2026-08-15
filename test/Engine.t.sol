@@ -70,5 +70,13 @@ contract EngineTest is Test {
         if (x == 0) return 0;
         y = x; uint256 k = (x >> 1) + 1;
         while (k < y) { y = k; k = (x / k + k) >> 1; }
+    
+
+    function test_RejectsBadSpec() public {
+        Engine.Spec memory s = bursty(Engine.Payoff.AsianCall, SPOT, 64, 1);
+        s.every = 5; // 78 is not divisible by 5
+        vm.expectRevert(Engine.BadSpec.selector); e.quote(s);
+        s = bursty(Engine.Payoff.Call, SPOT, 1, 1);
+        vm.expectRevert(Engine.BadSpec.selector); e.quote(s);
     }
 }
