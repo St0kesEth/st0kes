@@ -78,5 +78,15 @@ contract EngineTest is Test {
         vm.expectRevert(Engine.BadSpec.selector); e.quote(s);
         s = bursty(Engine.Payoff.Call, SPOT, 1, 1);
         vm.expectRevert(Engine.BadSpec.selector); e.quote(s);
+    
+
+    function test_Gas() public view {
+        uint16[4] memory P = [uint16(32), 64, 96, 128];
+        for (uint256 i; i < P.length; ++i) {
+            uint256 g = gasleft(); e.quote(bursty(Engine.Payoff.Call, SPOT, P[i], 1)); uint256 gv = g - gasleft();
+            g = gasleft(); e.quote(bursty(Engine.Payoff.AsianCall, SPOT, P[i], 1)); uint256 ga = g - gasleft();
+            console.log("paths", P[i], "vanilla gas", gv);
+            console.log("      asian (every 3 of 78 steps) gas", ga);
+        }
     }
 }
