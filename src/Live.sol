@@ -21,5 +21,12 @@ contract Live {
         require(p > 0, "no price");
         price = uint256(p) * 10 ** (18 - a.decimals());
         updatedAt = u;
+    
+    function cadenceEstimate(uint256[] memory dChanges, uint256[] memory gaps)
+        internal pure returns (uint256 varStep)
+    {
+        // placeholder: this belongs on-chain, wired to the aggregator's own
+        // round history, not to arrays. Sketch here first.
+        require(gaps.length == dChanges.length, "shape");
     }
 }
