@@ -28,5 +28,16 @@ contract LiveForkTest is Test {
         if (x == 0) return 0;
         y = x; uint256 k = (x >> 1) + 1;
         while (k < y) { y = k; k = (x / k + k) >> 1; }
+    
+
+    function test_QuoteNvdaAsianAtTheMoney() public view {
+        uint256 g = gasleft();
+        Live.Result memory r = live.quote(4, Engine.Payoff.AsianCall, 0, 78, 3, 128, 64, 1);
+        g -= gasleft();
+        console.log("NVDA spot", r.spot);
+        console.log("asian call, at the money:", r.mean, "+-", r.se);
+        console.log("gas", g);
+        assertLt((r.se * 100) / r.mean, 50);
+        assertLt(g, 36_000_000);
     }
 }
