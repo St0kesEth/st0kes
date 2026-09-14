@@ -1,6 +1,251 @@
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><title>St0kes engine</title></head>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A quote that reports its own error</title>
+<meta name="description" content="An average-price option on nine tokenised-equity feeds, priced by simulation inside one free view call, with the standard error of the estimate returned alongside the price.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.18.6/katex.min.css">
+<style>
+:root{
+  --ink:#111214; --soft:#555b63; --rule:#111214; --hair:#c9cdd3;
+  --link:#1a4d8f; --hot:#b3261e; --cool:#2f7fa8; --warm:#c97b2a;
+  --serif:"STIX Two Text",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:var(--ink);font-family:var(--serif);
+  font-size:19px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+.sheet{max-width:680px;margin:0 auto;padding:72px 24px 120px}
+
+.running{font-family:var(--mono);font-size:18px;color:var(--soft);display:flex;
+  justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:56px}
+h1.title{font-size:36px;line-height:1.18;font-weight:700;text-align:center;margin:0 0 22px;
+  letter-spacing:-.005em;text-wrap:balance}
+.affil{text-align:center;font-size:18px;color:var(--soft);font-style:italic;margin:0 0 44px}
+.abstract{margin:0 auto 44px;max-width:600px;text-align:justify;hyphens:auto;font-size:18.5px}
+.abstract b{font-weight:700}
+.keywords{max-width:600px;margin:-28px auto 48px;font-size:18px;text-align:justify}
+.keywords b{font-weight:700}
+
+h2{font-size:22px;font-weight:700;margin:44px 0 12px;line-height:1.25}
+h2 .num{display:inline-block;min-width:34px}
+p{margin:0;text-align:justify;hyphens:auto}
+p + p{text-indent:1.6em}
+p.noindent{text-indent:0}
+.eq{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;margin:14px 0;overflow-x:auto}
+.katex{font-size:1.05em}
+code,.addr{font-family:var(--mono);font-size:18px;word-break:break-word}
+
+figure{margin:28px 0 24px}
+figure.wide{width:min(880px,calc(100vw - 48px));margin-left:calc(50% - min(440px,50vw - 24px))}
+figcaption{font-size:18px;line-height:1.45;text-align:justify;margin-top:10px}
+figcaption b{font-weight:700}
+.tcap{font-size:18px;line-height:1.45;text-align:justify;margin:0 0 8px}
+.tcap b{font-weight:700}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:18px;font-variant-numeric:tabular-nums}
+thead th{font-weight:400;text-align:left;padding:8px 18px 8px 0;
+  border-top:1.5px solid var(--rule);border-bottom:1px solid var(--rule);white-space:nowrap}
+tbody td{padding:7px 18px 7px 0;white-space:nowrap}
+tbody tr:last-child td{border-bottom:1.5px solid var(--rule)}
+th.n,td.n{text-align:right;padding-left:16px;padding-right:0}
+td.dim{color:var(--soft)} td.hot{color:var(--hot)} td.cool{color:var(--cool)}
+tr.gate td{border-bottom:1px solid var(--rule)}
+svg{display:block;width:100%;height:auto}
+ol.refs{padding-left:0;list-style:none;font-size:18px;margin:0}
+ol.refs li{display:grid;grid-template-columns:36px 1fr;gap:6px;margin:0 0 8px;text-align:justify}
+@media (max-width:760px){
+  .sheet{padding:44px 18px 90px} h1.title{font-size:29px}
+  figure.wide{width:auto;margin-left:0}
+  thead th{white-space:normal;line-height:1.25;vertical-align:bottom}
+}
+.live{border-top:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule);padding:14px 0 6px;margin:22px 0}
+.live .head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:18px;color:var(--soft);margin-bottom:8px}
+.live .head b{color:var(--ink);font-weight:500}
+.live table tbody tr:last-child td{border-bottom:0}
+.bar{display:inline-block;height:10px;background:var(--cool);vertical-align:middle;border-radius:1px}
+.pending{font-size:18px;color:var(--soft);text-align:left}
+</style>
+</head>
 <body>
-<h1>A quote that reports its own error</h1>
-<p>Nothing built yet. See the tests.</p>
-</body></html>
+<main class="sheet">
+
+  <div class="running">
+    <span>Preprint v1, 20 September 2026</span>
+    <span>measured in Foundry and against the chain</span>
+  </div>
+
+  <h1 class="title">A quote that reports its own error</h1>
+  <p class="affil">Nine tokenised-equity feeds, one session, one free call</p>
+
+  <div class="abstract">
+    <b>Abstract.</b> An option on the average price of a session has no closed form, and it is the contract a chain settles most naturally, because the average of a feed's own prints is what the feed already publishes. This paper quotes it on nine tokenised-equity feeds inside a single free view call and returns the standard error of the estimate with the price. The walk carries a variance that feeds on itself, with the per-ticker coefficients fitted in [2] and the arithmetic of [1]. The variance it starts from is read from the feed's own publishing rhythm rather than imported: a deviation feed publishes when its price has moved by a threshold, so publications per second of trading time give the variance. Over <span id="a-windows">—</span> windows of sixty-four rounds the estimate has median ratio <span id="a-median">—</span> to realized five-minute volatility and lies within a third of it in <span id="a-within">—</span> percent of windows. The error bar is checked in the Brownian limit against Black-Scholes: across a hundred quotes the error each one reports agrees with the spread the hundred show to within <span id="a-calib">—</span> percent. A live quote of 128 paths costs <span id="a-gaslo">—</span> to <span id="a-gashi">—</span> million gas, inside the public node's budget of about <span id="a-budget">—</span> million, and the at-the-money one-session call on NVDA at block <span id="a-block">—</span> was <span id="a-nvda">—</span> ± <span id="a-nvdase">—</span> dollars. Nothing is written, owned or updatable.
+  </div>
+  <p class="keywords"><b>Keywords.</b> Asian options, Monte Carlo, standard error, deviation feeds, volatility clustering, view calls</p>
+
+  <h2><span class="num">1</span>The price nobody quoted</h2>
+  <p>The on-chain option protocols surveyed in [1] price from a closed form. An option on the average price over a session has none: the arithmetic mean of lognormal prices is not lognormal, and the standard treatment is simulation [4]. It is also the natural contract for a chain to settle. The average of a feed's own prints over a session is public, needs no second source, and one bad print moves it by a twenty-sixth of what it moves a close. So the contract that is easiest to settle on chain was the one that could not be quoted there. This paper quotes it, and returns with every price the standard error of the estimate that produced it, so that the number and the noise around it arrive together.</p>
+
+  <h2><span class="num">2</span>The walk</h2>
+  <p>One step is five minutes and a session is 78 steps. The log price moves by a normal draw scaled by the current standard deviation, and the variance for the next step is a fixed weight on the last squared move plus a fixed weight on the last variance:</p>
+  <div class="eq"><div class="tex" data-tex="\log S_{t+1} = \log S_t - \tfrac{1}{2} v_t + \sqrt{v_t}\, z_t, \qquad v_{t+1} = \omega + \alpha\, v_t z_t^2 + \beta\, v_t."></div><div class="tag">(1)</div></div>
+  <p class="noindent">This is GARCH(1,1) [5], and with <em>α</em> = <em>β</em> = 0 it is geometric Brownian motion. The coefficients are the per-ticker fits of [2], carried in the contract as constants (Table 1). The arithmetic is that of [1]: the standard deviation is a square root warm-started from the previous step with five Newton passes, each normal draw is one hash, and for a terminal payoff the exponential runs once a path. The average-price payoff needs the price itself at the points it averages, here every third step, so it exponentiates twenty-six times a path instead of once; Section 5 prices that difference.</p>
+  <p class="tcap"><b>Table 1.</b> The coefficients carried per feed, from [2]. The long-run volatility is <em>ω</em>/(1 − <em>α</em> − <em>β</em>) per step, annualised over 78 steps a day and 252 days. The half-life is the number of five-minute steps for a shock to the variance to decay by half.</p>
+  <div class="tw"><table><thead><tr><th>feed</th><th class="n"><em>α</em></th><th class="n"><em>β</em></th><th class="n"><em>α</em> + <em>β</em></th><th class="n">half-life</th><th class="n">long-run vol</th></tr></thead><tbody id="t1"></tbody></table></div>
+
+  <h2><span class="num">3</span>Where the variance comes from</h2>
+  <p>The walk needs a variance to start from. The usual source is a number imported from off chain or agreed by a vote [1]; here it is read from the feed itself. A deviation feed publishes when its price has moved by a fixed fraction <em>δ</em> of its value. For a driftless walk the expected time to travel <em>δ</em> is <em>δ</em><sup>2</sup>/<em>σ</em><sup>2</sup>, so the number of publications per second of trading time is the variance per second, and per five-minute step</p>
+  <div class="eq"><div class="tex" data-tex="v_0 = \delta^2 \cdot \frac{n \cdot 300}{T},"></div><div class="tag">(2)</div></div>
+  <p class="noindent">taken over the feed's last sixty-four rounds, with <em>δ</em> the median absolute change between consecutive answers, <em>n</em> the number of gaps shorter than two hours and <em>T</em> their sum. Gaps longer than two hours are overnight or weekend and are not trading time. The same computation is run off chain on cached rounds and compared with the standard deviation of five-minute bar returns over the same span: on <span id="c-windows">—</span> windows across the nine tickers the ratio of the two has median <span id="c-median">—</span>, tenth percentile <span id="c-p10">—</span> and ninetieth percentile <span id="c-p90">—</span>, and <span id="c-within">—</span> percent of windows fall within a third of realized (Table 2). The estimate is coarse where the feed is quiet: SPY publishes about once a day, so its sixty-four rounds span two months and Table 2 has a single window for it.</p>
+  <p class="tcap"><b>Table 2.</b> Volatility read from the feed's rhythm, divided by realized five-minute volatility over the same span, per ticker: the number of sixty-four-round windows, the median ratio and its range.</p>
+  <div class="tw"><table><thead><tr><th>feed</th><th class="n">windows</th><th class="n">median ratio</th><th class="n">range</th></tr></thead><tbody id="t2"></tbody></table></div>
+
+  <h2><span class="num">4</span>The error bar</h2>
+  <p>A quote is the mean of the payoffs over <em>N</em> paths and the standard error of that mean, <em>s</em>/√<em>N</em>, with <em>s</em> the sample standard deviation of the payoffs. The check is the Brownian limit, where the vanilla call has a closed form [3]. A hundred quotes of 128 paths each are priced at three strikes. Their average sits on Black-Scholes within <span id="r-gapmax">—</span> standard errors of the hundred-quote mean at every strike, and the error each quote reports agrees with the spread the hundred actually show to within <span id="r-calibmax">—</span> percent (Table 3). The error bar is not a decoration on the estimate; it is the estimate's own measurement of itself, and it is right.</p>
+  <p class="tcap"><b>Table 3.</b> A hundred quotes of 128 paths against the closed form, spot 100, constant variance 4 × 10<sup>−6</sup> per step, 78 steps. Prices in units of spot.</p>
+  <div class="tw"><table><thead><tr><th>contract</th><th class="n">Black-Scholes</th><th class="n">mean of 100</th><th class="n">reported error</th><th class="n">observed spread</th><th class="n">ratio</th></tr></thead><tbody id="t3"></tbody></table></div>
+
+  <h2><span class="num">5</span>Cost</h2>
+  <p>Table 4 prices one quote at 78 steps as the paths grow, for the vanilla call, which exponentiates once a path, and for the average-price call, which exponentiates twenty-six times. The public node's budget for a view call was measured directly rather than assumed: with the engine's bytecode placed at an empty address by state override, the same average-price quote was asked with more and more paths until the node refused. It answered <span id="b-ok">—</span> paths and refused <span id="b-no">—</span>, which by the slope of Table 4 puts the budget near <span id="b-gas">—</span> million gas. A live quote of 128 paths, including the sixty-five round reads that set the variance, costs between <span id="f-gaslo">—</span> and <span id="f-gashi">—</span> million gas across the nine feeds.</p>
+  <p class="tcap"><b>Table 4.</b> Gas for one quote at 78 steps, NVDA coefficients, as measured by the test suite.</p>
+  <div class="tw"><table><thead><tr><th>paths</th><th class="n">vanilla call</th><th class="n">average-price call</th></tr></thead><tbody id="t4"></tbody></table></div>
+
+  <h2><span class="num">6</span>Quotes from the chain</h2>
+  <p>Table 5 is the fork test at block <span id="f-block">—</span>. For each feed it shows the spot the feed held, the volatility read from its rhythm, annualised, the threshold the feed was found to publish at, and the at-the-money average-price call for one session with its standard error, seed 1, 128 paths.</p>
+  <p class="tcap"><b>Table 5.</b> Nine feeds at one block. Prices in dollars; the error is the standard error of the quote, then as a share of it.</p>
+  <div class="tw"><table><thead><tr><th>feed</th><th class="n">spot</th><th class="n">vol from rhythm</th><th class="n"><em>δ</em></th><th class="n">call ± error</th><th class="n">share</th><th class="n">gas</th></tr></thead><tbody id="t5"></tbody></table></div>
+
+  <div class="live">
+    <div class="head"><span id="live-title">Live from the deployed contract</span><span id="live-state">—</span></div>
+    <div class="tw"><table><thead><tr><th>feed</th><th class="n">spot</th><th class="n">feed age</th><th class="n">call ± error</th><th></th></tr></thead><tbody id="live-rows"></tbody></table></div>
+    <p class="pending" id="live-note">Seed is the block number, so the estimate is drawn afresh each time and moves inside its own error bar. Refreshed every minute.</p>
+  </div>
+
+  <h2><span class="num">7</span>What this is and is not</h2>
+  <p>It is a price with its uncertainty printed next to it, computed by a public contract from public inputs, and reproducible by anyone who has the seed. It is not a quote to trade on. At 128 paths the error is <span id="l-selo">—</span> to <span id="l-sehi">—</span> percent of the price, and a thousand paths would cost about <span id="l-gas1k">—</span> million gas, several times the budget of Section 5. The variance it starts from is within a third of realized in five windows out of six, not all. Spot is the feed's last print, which outside a session can be hours old, and the age is returned with every quote. There is no discounting; the walk is a martingale at zero rate. Any contract that settles on this quote must average the same marks the walk averages, every fifteen minutes across the session, and must fix its own seed rule, because the engine takes the seed from the caller.</p>
+
+  <h2><span class="num">8</span>Reproduction</h2>
+  <p><code>test/Audit.t.sol</code> writes Tables 3 and 4 during the run that checks them; <code>test/Live.fork.t.sol</code> writes Table 5 against the chain at the fixed block; <code>tools/cadence.py</code> writes Table 2 from the cached rounds and bars and stamps the SHA-256 of each input; <code>tools/budget.py</code> writes the node's budget. <code>src/Engine.sol</code> is the walk and the payoffs, <code>src/Live.sol</code> binds it to the feeds and reads the variance from their rhythm, <code>src/Feeds.sol</code> is generated from the fits of [2].</p>
+  <div class="eq"><code>forge test &nbsp;&amp;&amp;&nbsp; python3 tools/cadence.py &nbsp;&amp;&amp;&nbsp; python3 tools/budget.py</code></div>
+  <p class="noindent" id="deploy-line">Deployment pending.</p>
+
+  <h2>References</h2>
+  <ol class="refs">
+    <li><span>[1]</span><span>St0kes. <em>Making simulation affordable on chain.</em> <a href="/simulation/">st0kes.blog/simulation</a>, 2026.</span></li>
+    <li><span>[2]</span><span>St0kes. <em>The term a Monte Carlo engine drops.</em> <a href="/intermittency/">st0kes.blog/intermittency</a>, 2026.</span></li>
+    <li><span>[3]</span><span>F. Black, M. Scholes. The pricing of options and corporate liabilities. <em>Journal of Political Economy</em> 81, 637–654, 1973.</span></li>
+    <li><span>[4]</span><span>A. Kemna, A. Vorst. A pricing method for options based on average asset values. <em>Journal of Banking and Finance</em> 14, 113–129, 1990.</span></li>
+    <li><span>[5]</span><span>T. Bollerslev. Generalized autoregressive conditional heteroskedasticity. <em>Journal of Econometrics</em> 31, 307–327, 1986.</span></li>
+  </ol>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.18.6/katex.min.js"></script>
+<script type="module">
+import R from "./research.js";
+import C from "./cadence.js";
+import F from "./fork.js";
+import B from "./budget.js";
+
+const $ = (id) => document.getElementById(id);
+const n = (v) => v.toLocaleString();
+const f = (v, d = 2) => Number(v).toFixed(d);
+const usd = (v) => (Number(v) / 1e18).toFixed(3);
+const pct = (v, d = 1) => (Number(v) * 100).toFixed(d);
+const ANN = Math.sqrt(78 * 252);
+
+document.querySelectorAll(".tex").forEach((el) => katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false }));
+
+/* 1. coefficients */
+$("t1").innerHTML = F.feeds.map((x) => {
+  const a = x.alpha / 1e18, b = x.beta / 1e18, w = x.omega / 1e18;
+  const longRun = Math.sqrt(w / (1 - a - b)) * ANN * 100;
+  const half = Math.log(0.5) / Math.log(a + b);
+  return `<tr><td>${x.symbol}</td><td class="n">${f(a, 3)}</td><td class="n">${f(b, 3)}</td><td class="n">${f(a + b, 3)}</td><td class="n">${f(half, 0)} steps</td><td class="n">${f(longRun, 0)}%</td></tr>`;
+}).join("");
+
+/* 2. the rhythm estimate against realized */
+$("t2").innerHTML = Object.entries(C.tickers).map(([k, v]) =>
+  `<tr><td>${k}</td><td class="n">${v.windows}</td><td class="n">${f(v.median)}</td><td class="n">${f(v.min)} to ${f(v.max)}</td></tr>`).join("");
+const P = C.pooled;
+$("c-windows").textContent = n(P.windows); $("c-median").textContent = f(P.median);
+$("c-p10").textContent = f(P.p10); $("c-p90").textContent = f(P.p90); $("c-within").textContent = pct(P.withinAThird, 0);
+$("a-windows").textContent = n(P.windows); $("a-median").textContent = f(P.median); $("a-within").textContent = pct(P.withinAThird, 0);
+
+/* 3. calibration */
+let gapMax = 0, calibMax = 0;
+$("t3").innerHTML = R.calibration.map((r) => {
+  const ratio = r.observedSpread / r.reportedSe;
+  gapMax = Math.max(gapMax, r.gapInSeOfMeanBps / 1e4); calibMax = Math.max(calibMax, Math.abs(ratio - 1));
+  return `<tr><td>${r.contract}</td><td class="n">${f(r.exact / 1e18, 4)}</td><td class="n">${f(r.mean / 1e18, 4)}</td><td class="n">${f(r.reportedSe / 1e18, 4)}</td><td class="n">${f(r.observedSpread / 1e18, 4)}</td><td class="n">${f(ratio)}</td></tr>`;
+}).join("");
+$("r-gapmax").textContent = f(gapMax, 1); $("r-calibmax").textContent = f(calibMax * 100, 0); $("a-calib").textContent = f(calibMax * 100, 0);
+
+/* 4. cost */
+const asianAt128 = R.gas.find((g) => g.paths === 128).asian;
+const slope = asianAt128 / 128;
+$("t4").innerHTML = R.gas.map((g) =>
+  `<tr><td>${g.paths}</td><td class="n">${n(g.vanilla)}</td><td class="n">${n(g.asian)}</td></tr>`).join("");
+$("b-ok").textContent = n(B.largestAnswered); $("b-no").textContent = n(B.smallestRefused);
+const budgetM = (B.largestAnswered * slope) / 1e6;
+$("b-gas").textContent = f(budgetM, 0); $("a-budget").textContent = f(budgetM, 0);
+$("l-gas1k").textContent = n(Math.round((1024 * slope) / 1e6));
+
+/* 5. the chain sample */
+const gases = F.feeds.map((x) => x.gas), shares = F.feeds.map((x) => x.se / x.asianCall);
+$("t5").innerHTML = F.feeds.map((x) => {
+  const vol = Math.sqrt(x.varStep / 1e18) * ANN * 100;
+  return `<tr><td>${x.symbol}</td><td class="n">${f(x.spot / 1e18)}</td><td class="n">${f(vol, 0)}%</td><td class="n">${f(x.threshold / 1e16, 2)}%</td><td class="n">${usd(x.asianCall)} ± ${usd(x.se)}</td><td class="n">${pct(x.se / x.asianCall, 1)}%</td><td class="n dim">${(x.gas / 1e6).toFixed(1)}M</td></tr>`;
+}).join("");
+$("f-block").textContent = n(F.block); $("a-block").textContent = n(F.block);
+$("f-gaslo").textContent = (Math.min(...gases) / 1e6).toFixed(1); $("f-gashi").textContent = (Math.max(...gases) / 1e6).toFixed(1);
+$("a-gaslo").textContent = (Math.min(...gases) / 1e6).toFixed(1); $("a-gashi").textContent = (Math.max(...gases) / 1e6).toFixed(1);
+$("l-selo").textContent = pct(Math.min(...shares), 0); $("l-sehi").textContent = pct(Math.max(...shares), 0);
+const nvda = F.feeds.find((x) => x.symbol === "NVDA");
+$("a-nvda").textContent = usd(nvda.asianCall); $("a-nvdase").textContent = usd(nvda.se);
+
+/* 6. live, once deployed */
+const RPC = B.rpc, SEL = "0x3360ad57";
+const pad = (v) => BigInt(v).toString(16).padStart(64, "0");
+async function rpc(method, params) {
+  const r = await fetch(RPC, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) });
+  const j = await r.json(); if (j.error) throw new Error(j.error.message); return j.result;
+}
+const word = (hex, i) => BigInt("0x" + hex.slice(2 + 64 * i, 66 + 64 * i));
+async function refresh(D) {
+  const block = Number(await rpc("eth_blockNumber", []));
+  $("live-state").innerHTML = `block <b>${n(block)}</b>`;
+  const rows = await Promise.all(F.feeds.map(async (x, i) => {
+    try {
+      const data = SEL + [i, 2, 0, 78, 3, 128, 64, block].map(pad).join("");
+      const out = await rpc("eth_call", [{ to: D.live, data }, "latest"]);
+      const mean = word(out, 0), se = word(out, 1), spot = word(out, 2), upd = Number(word(out, 3));
+      const age = Math.max(0, Math.round((Date.now() / 1000 - upd) / 60));
+      const ageText = age < 60 ? `${age} min` : age < 2880 ? `${Math.round(age / 60)} h` : `${Math.round(age / 1440)} d`;
+      const share = Number(se) / Number(mean);
+      return `<tr><td>${x.symbol}</td><td class="n">${f(Number(spot) / 1e18)}</td><td class="n dim">${ageText}</td><td class="n">${usd(mean)} ± ${usd(se)}</td><td><span class="bar" style="width:${Math.min(120, share * 400).toFixed(0)}px" title="${pct(share)}% of the price"></span></td></tr>`;
+    } catch (e) { return `<tr><td>${x.symbol}</td><td class="n dim" colspan="4">${e.message.slice(0, 60)}</td></tr>`; }
+  }));
+  $("live-rows").innerHTML = rows.join("");
+}
+try {
+  const D = (await import("./deploy.js")).default;
+  if (!D) throw new Error("not deployed");
+  $("deploy-line").innerHTML = `Deployed on the chain the feeds live on: Engine <code class="addr">${D.engine}</code>, Live <code class="addr">${D.live}</code>.`;
+  await refresh(D); setInterval(() => refresh(D).catch(() => {}), 60_000);
+} catch {
+  $("live-state").textContent = "not yet deployed";
+  $("live-note").textContent = "The contracts are not yet on the chain. This panel fills itself when they are.";
+}
+</script>
+</body>
+</html>
