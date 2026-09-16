@@ -1,3 +1,4 @@
+# Regenerate whenever data/garch-fits.json changes.
 """Writes src/Feeds.sol from data/garch-fits.json, the per-ticker GARCH(1,1) fits
 published with the intermittency paper (omega in percent squared per five-minute
 bar; alpha, beta dimensionless), and the aggregators of the feeds they were fitted on."""
