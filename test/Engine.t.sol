@@ -51,6 +51,7 @@ contract EngineTest is Test {
 
     function check(Engine.Spec memory s, uint256 exact) internal view {
         uint256 n = 100; uint256 sum; uint256 sq; uint256 seSum;
+        // each seed is one independent draw of the estimator
         for (uint256 k = 1; k <= n; ++k) {
             s.seed = k;
             (uint256 m, uint256 se) = e.quote(s);
