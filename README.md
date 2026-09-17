@@ -14,7 +14,7 @@ standard error of its own estimate with the price.
 Every number in the paper (`web/index.html`, published at
 st0kes.blog/engine) is written by the run that checks it:
 
-    forge test                       # unit tests; test/Audit.t.sol writes web/research.js
+    forge test                             # unit + audit; writes web/research.js
     forge test --match-path 'test/Live.fork.t.sol'   # against the chain at a fixed block; writes web/fork.js
     python3 tools/cadence.py         # volatility-from-rhythm against realized; writes web/cadence.js
     python3 tools/budget.py          # the public node's view-call budget; writes web/budget.js
