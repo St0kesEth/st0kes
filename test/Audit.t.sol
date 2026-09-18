@@ -48,7 +48,7 @@ contract AuditTest is Test {
     /// A hundred quotes of 128 paths: their mean against the closed form, the
     /// error they report against the spread they actually show.
     function calib(string memory label, Engine.Spec memory s, uint256 exact) internal view returns (string memory) {
-        uint256 n = 100; uint256 sum; uint256 sq; uint256 seSum;
+        uint256 n = 100; uint256 sum; uint256 sq; uint256 seSum; // 100 seeds gives a stable spread at 128 paths
         for (uint256 k = 1; k <= n; ++k) {
             s.seed = k;
             (uint256 m, uint256 se) = e.quote(s);
