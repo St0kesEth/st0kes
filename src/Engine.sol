@@ -13,7 +13,9 @@ pragma solidity 0.8.26;
 /// Stateless and unowned. The same spec and seed always give the same answer.
 contract Engine {
     uint256 internal constant ONE = 1e18;
-    uint256 internal constant PASSES = 5; // Newton passes on the warm-started root
+    /// Newton passes on the warm-started root; five is exact against seven
+    /// at every step tested in the precision suite.
+    uint256 internal constant PASSES = 5;
 
     enum Payoff { Call, Put, AsianCall, AsianPut }
 
