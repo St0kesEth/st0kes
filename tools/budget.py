@@ -13,7 +13,7 @@ def ask(paths):
     r = subprocess.run(["cast", "call", ADDR, SIG, spec, "--override-code", f"{ADDR}:{code}", "--rpc-url", RPC], capture_output=True, text=True)
     return r.returncode == 0 and "Error" not in r.stdout + r.stderr
 block = int(subprocess.run(["cast", "block-number", "--rpc-url", RPC], capture_output=True, text=True).stdout.strip())
-lo, hi = 128, 256                      # 128 known to pass; find the first refusal by bisection
+lo, hi = 128, 256                      # 128 always passes; bisect for the first refusal
 assert ask(lo), "128 paths refused"
 while ask(hi): lo, hi = hi, hi * 2
 while hi - lo > 4:
