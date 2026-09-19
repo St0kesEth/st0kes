@@ -7,7 +7,7 @@ Each window is compared with the standard deviation of five-minute bar returns
 over the same span. Writes web/cadence.js with the SHA-256 of every input."""
 import json, glob, os, math, hashlib, statistics as st
 HERE = os.path.dirname(os.path.abspath(__file__)); DATA = os.path.join(HERE, "..", "data")
-ROUNDS, GAP, STEP = 64, 7200, 300
+ROUNDS, GAP, STEP = 64, 7200, 300   # window rounds, session gap in s, five-minute step
 
 def rows(path):
     o = json.load(open(path))
