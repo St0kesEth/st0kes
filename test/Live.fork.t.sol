@@ -25,7 +25,7 @@ contract LiveForkTest is Test {
             console.log(f[i].symbol, "sd per step (bps)", isqrt(v * 1e18) / 1e14, "threshold (bps)");
             console.log("   ", thr / 1e14, "prints / trading seconds", prints);
             console.log("   ", secs);
-            assertGt(thr, 0.002e18, "threshold too small");
+            assertGt(thr, 0.002e18, "threshold below 20 bps is not a real deviation feed");
             assertLt(thr, 0.02e18, "threshold too large");
         }
     }
