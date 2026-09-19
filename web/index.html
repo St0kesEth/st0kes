@@ -244,7 +244,7 @@ try {
   await refresh(D); setInterval(() => refresh(D).catch(() => {}), 60_000);
 } catch {
   $("live-state").textContent = "not yet deployed";
-  $("live-note").textContent = "The contracts are not yet on the chain. This panel fills itself when they are.";
+  $("live-note").textContent = "The contracts are not yet on the chain. This panel wakes when they are.";
 }
 </script>
 </body>
