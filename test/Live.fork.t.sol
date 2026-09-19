@@ -38,7 +38,7 @@ contract LiveForkTest is Test {
         console.log("asian call, at the money, one session:", r.mean, "+-", r.se);
         console.log("gas for the whole live quote", g);
         assertLt((r.se * 100) / r.mean, 50, "too noisy");
-        assertLt(g, 36_000_000, "over the node's call budget");
+        assertLt(g, 36_000_000, "one live quote must fit under the public node's budget");
     }
 
 
