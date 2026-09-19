@@ -17,7 +17,8 @@ interface IAggregator {
 contract Live {
     uint256 internal constant ONE = 1e18;
     uint256 public constant STEP = 300;         // one step of the walk is five minutes
-    uint256 public constant SESSION_GAP = 7200; // a gap longer than this is not trading time
+    /// A gap longer than this is not trading time (overnight or weekend).
+    uint256 public constant SESSION_GAP = 7200;
 
     struct Feed {
         address aggregator;
