@@ -131,7 +131,7 @@ ol.refs li{display:grid;grid-template-columns:36px 1fr;gap:6px;margin:0 0 8px;te
   <h2><span class="num">8</span>Reproduction</h2>
   <p><code>test/Audit.t.sol</code> writes Tables 3 and 4 during the run that checks them; <code>test/Live.fork.t.sol</code> writes Table 5 against the chain at the fixed block; <code>tools/cadence.py</code> writes Table 2 from the cached rounds and bars and stamps the SHA-256 of each input; <code>tools/budget.py</code> writes the node's budget. <code>src/Engine.sol</code> is the walk and the payoffs, <code>src/Live.sol</code> binds it to the feeds and reads the variance from their rhythm, <code>src/Feeds.sol</code> is generated from the fits of [2].</p>
   <div class="eq"><code>forge test &nbsp;&amp;&amp;&nbsp; python3 tools/cadence.py &nbsp;&amp;&amp;&nbsp; python3 tools/budget.py</code></div>
-  <p class="noindent" id="deploy-line">Deployment pending.</p>
+  <p class="noindent" id="deploy-line">Deployment pending. The engine repository is at <a href="https://github.com/St0kesEth/st0kes">github.com/St0kesEth/st0kes</a>.</p>
 
   <h2>References</h2>
   <ol class="refs">
@@ -235,7 +235,7 @@ async function refresh(D) {
 try {
   const D = (await import("./deploy.js")).default;
   if (!D) throw new Error("not deployed");
-  $("deploy-line").innerHTML = `Deployed on the chain the feeds live on: Engine <code class="addr">${D.engine}</code>, Live <code class="addr">${D.live}</code>.`;
+  $("deploy-line").innerHTML = `Deployed on the chain the feeds live on: Engine <code class="addr">${D.engine}</code>, Live <code class="addr">${D.live}</code>. The engine repository is at <a href="https://github.com/St0kesEth/st0kes">github.com/St0kesEth/st0kes</a>.`;
   await refresh(D); setInterval(() => refresh(D).catch(() => {}), 60_000);
 } catch {
   $("live-state").textContent = "not yet deployed";
