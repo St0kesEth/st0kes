@@ -82,6 +82,7 @@ ol.refs li{display:grid;grid-template-columns:36px 1fr;gap:6px;margin:0 0 8px;te
 .live table tbody tr:last-child td{border-bottom:0}
 .bar{display:inline-block;height:10px;background:var(--cool);vertical-align:middle;border-radius:1px}
 .pending{font-size:18px;color:var(--soft);text-align:left}
+.check{font-family:var(--mono);font-size:18px;line-height:1.7;white-space:nowrap;overflow-x:auto;margin:6px 0 0}
 </style>
 </head>
 <body>
@@ -155,7 +156,7 @@ ol.refs li{display:grid;grid-template-columns:36px 1fr;gap:6px;margin:0 0 8px;te
     <div class="tw"><table><thead><tr><th>feed</th><th class="n">spot</th><th class="n">feed age</th><th class="n">call ± error</th><th></th></tr></thead><tbody id="live-rows"></tbody></table></div>
     <figure class="wide" id="live-fig" hidden>
       <div class="figscroll"><svg viewBox="0 0 720 380" id="fig-replay" role="img" aria-labelledby="fig4cap"></svg></div>
-      <div class="tw"><table><tbody id="replay-rows"></tbody></table></div>
+      <p class="check" id="replay-check"></p>
       <figcaption id="fig4cap"><b>Figure 4.</b> The 128 paths behind the NVDA quote above, replayed in this browser from the spot, variance and seed the quote returned, with the contract's arithmetic (web/replay.js in the repository; tools/replay.py is the same walk in Python). Warm paths finish with a session average above spot and pay. Under the figure, the replay's mean and standard error stand against the chain's own. <span id="replay-verdict">—</span></figcaption>
     </figure>
     <p class="pending" id="live-note">Seed is the block number, so the estimate is drawn afresh each time and moves inside its own error bar. Refreshed every minute; the panel stops when the tab is hidden. Outside the trading session the feed age is measured in hours because the feed itself is quiet.</p>
@@ -358,7 +359,7 @@ async function drawReplay(D, out, i) {
   const spot = word(out, 2), varStep = word(out, 4), seed = word(out, 5), mean = word(out, 0), se = word(out, 1);
   const r = replay(window.keccak256, { spot, varStep, omega: c.omega, alpha: c.alpha, beta: c.beta, seed, steps: 78, every: 3, paths: 128 });
   const same = r.mean === mean && r.se === se;
-  $("replay-rows").innerHTML = `<tr><td>this browser</td><td class="n">${wei(r.mean)} ± ${wei(r.se)}</td></tr><tr><td>the chain</td><td class="n">${wei(mean)} ± ${wei(se)}</td></tr>`;
+  $("replay-check").innerHTML = `this browser ${wei(r.mean)} ± ${wei(r.se)}<br>the chain    ${wei(mean)} ± ${wei(se)}`.replace(/ {2,}/g, (m) => "&nbsp;".repeat(m.length));
   $("replay-verdict").textContent = same ? `Seed ${n(Number(seed))}: they match, to the wei.` : `Seed ${n(Number(seed))}: they differ.`;
   const svg = $("fig-replay"), W = 720, H = 380, L = 96, R = 32, T = 22, B = 64;
   const s0 = Number(spot) / 1e18, all = r.series.flat();
