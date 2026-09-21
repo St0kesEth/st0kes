@@ -165,6 +165,11 @@ ol.refs li{display:grid;grid-template-columns:36px 1fr;gap:6px;margin:0 0 8px;te
       <div class="tw"><table><thead><tr><th>strike</th><th class="n">of spot</th><th class="n">call ± error</th><th class="n">put ± error</th></tr></thead><tbody id="strip-rows"></tbody></table></div>
       <p class="pending" id="strip-note">Thirty-two strikes, calls and puts, each with the standard error of its estimate, priced by StripLive from one set of 128 paths walked as 64 mirrored pairs. The error is computed across the pairs, not the paths. Same session, same average-price payoff and same variance as the quote above; the seed is the block number.</p>
     </div>
+    <div id="live-strip-spcx" hidden>
+      <p class="tcap"><b>Table 7.</b> <span id="strip-cap-spcx">SpaceX option chain from one free call.</span></p>
+      <div class="tw"><table><thead><tr><th>strike</th><th class="n">of spot</th><th class="n">call ± error</th><th class="n">put ± error</th></tr></thead><tbody id="strip-rows-spcx"></tbody></table></div>
+      <p class="pending" id="strip-note-spcx">SpaceX is private and has no options market anywhere. Its Robinhood Chain feed publishes on movement like the other nine, so the same call prices it. There is no bar history to fit a variance memory to, so for SpaceX the walk keeps the variance the feed's rhythm gives it for the whole session.</p>
+    </div>
     <p class="pending" id="live-note">Seed is the block number, so the estimate is drawn afresh each time and moves inside its own error bar. Refreshed every minute; the panel stops when the tab is hidden. Outside the trading session the feed age is measured in hours because the feed itself is quiet.</p>
   </div>
 
@@ -201,7 +206,8 @@ const n = (v) => v.toLocaleString();
 const f = (v, d = 2) => Number(v).toFixed(d);
 const usd = (v) => (Number(v) / 1e18).toFixed(3);
 const pct = (v, d = 1) => (Number(v) * 100).toFixed(d);
-const mark = (sym) => `<img class="mark" src="./assets/stocks/${sym}.png" alt="" width="22" height="22">${sym}`;
+const tile = (sym) => `<img class="mark" src="./assets/stocks/${sym}.png" alt="" width="22" height="22">`;
+const mark = (sym) => tile(sym) + sym;
 const ANN = Math.sqrt(78 * 252);
 
 document.querySelectorAll(".tex").forEach((el) => katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false }));
@@ -346,17 +352,18 @@ async function refresh(D) {
   }));
   $("live-rows").innerHTML = rows.join("");
   if (nvdaOut) await drawReplay(D, nvdaOut, 4);
-  if (D.stripLive) await drawStrip(D, block).catch((e) => console.error("strip", e));
+  if (D.stripLive) await drawStrip(D.stripLive, 4, "NVDA", block, "").catch((e) => console.error("strip", e));
+  if (D.stripLiveSpaceX) await drawStrip(D.stripLiveSpaceX, 9, "SpaceX", block, "-spcx").catch((e) => console.error("strip spcx", e));
 }
 
 /* Table 6: the NVDA strike strip from StripLive, one call, 32 strikes */
 const STRIP_SEL = "0xcfde1298", STRIP_BPS = Array.from({ length: 32 }, (_, k) => 9625 + 25 * k);
-async function drawStrip(D, block) {
-  const head = [4, 9 * 32, 1, 78, 3, 128, 64, block, 1].map(pad).join(""), tail = pad(STRIP_BPS.length) + STRIP_BPS.map(pad).join("");
+async function drawStrip(address, feed, name, block, sfx) {
+  const head = [feed, 9 * 32, 1, 78, 3, 128, 64, block, 1].map(pad).join(""), tail = pad(STRIP_BPS.length) + STRIP_BPS.map(pad).join("");
   const data = STRIP_SEL + pad(32) + head + tail;
   const [out, gas] = await Promise.all([
-    rpc("eth_call", [{ to: D.stripLive, data }, "latest"]),
-    rpc("eth_estimateGas", [{ to: D.stripLive, data }]).then((g) => Number(g)).catch(() => 0),
+    rpc("eth_call", [{ to: address, data }, "latest"]),
+    rpc("eth_estimateGas", [{ to: address, data }]).then((g) => Number(g)).catch(() => 0),
   ]);
   const w = (k) => word(out, k);
   const R = Number(w(0)) / 32, S = R + Number(w(R)) / 32, Q = S + Number(w(S)) / 32;
@@ -366,9 +373,10 @@ async function drawStrip(D, block) {
     const b = Q + 1 + 5 * j, atm = STRIP_BPS[j] === 10000;
     rows.push(`<tr${atm ? ' class="gate"' : ""}><td>${f(Number(w(b)) / 1e18)}</td><td class="n dim">${(STRIP_BPS[j] / 100).toFixed(2)}%</td><td class="n">${usd(w(b + 1))} ± ${usd(w(b + 3))}</td><td class="n">${usd(w(b + 2))} ± ${usd(w(b + 4))}</td></tr>`);
   }
-  $("strip-rows").innerHTML = rows.join("");
-  $("strip-cap").innerHTML = `${mark("NVDA")} option chain from one free call: spot ${f(Number(spot) / 1e18)}, block ${n(block)}, ${count} strikes from ${(STRIP_BPS[0] / 100).toFixed(2)} to ${(STRIP_BPS[count - 1] / 100).toFixed(2)} percent of spot, one session, average price${gas ? `, ${(gas / 1e6).toFixed(1)} million gas` : ""}. Prices in dollars.`;
-  $("live-strip").hidden = false;
+  $("strip-rows" + sfx).innerHTML = rows.join("");
+  const tileName = name === "SpaceX" ? "SPCX" : name;
+  $("strip-cap" + sfx).innerHTML = `${tile(tileName)}${name} option chain from one free call: spot ${f(Number(spot) / 1e18)}, block ${n(block)}, ${count} strikes from ${(STRIP_BPS[0] / 100).toFixed(2)} to ${(STRIP_BPS[count - 1] / 100).toFixed(2)} percent of spot, one session, average price${gas ? `, ${(gas / 1e6).toFixed(1)} million gas` : ""}. Prices in dollars.`;
+  $("live-strip" + sfx).hidden = false;
 }
 
 /* the coefficients the contract carries, read once from the chain */
@@ -417,7 +425,7 @@ async function drawReplay(D, out, i) {
 try {
   const D = (await import("./deploy.js")).default;
   if (!D) throw new Error("not deployed");
-  $("deploy-line").innerHTML = `Deployed on the chain the feeds live on: Engine <code class="addr">${D.engine}</code>, Live <code class="addr">${D.live}</code>${D.stripLive ? `, and for the strike strip of Table 6, StripEngine <code class="addr">${D.stripEngine}</code> and StripLive <code class="addr">${D.stripLive}</code>` : ""}. The engine repository is at <a href="https://github.com/St0kesEth/st0kes">github.com/St0kesEth/st0kes</a>.`;
+  $("deploy-line").innerHTML = `Deployed on the chain the feeds live on: Engine <code class="addr">${D.engine}</code>, Live <code class="addr">${D.live}</code>${D.stripLive ? `, and for the strike strips of Tables 6 and 7, StripEngine <code class="addr">${D.stripEngine}</code>, StripLive <code class="addr">${D.stripLive}</code>` : ""}${D.stripLiveSpaceX ? ` and, with the SpaceX feed as its tenth, StripLive <code class="addr">${D.stripLiveSpaceX}</code>` : ""}. The engine repository is at <a href="https://github.com/St0kesEth/st0kes">github.com/St0kesEth/st0kes</a>.`;
   await refresh(D); setInterval(() => refresh(D).catch(() => {}), 60_000);
 } catch {
   $("live-state").textContent = "not yet deployed";
