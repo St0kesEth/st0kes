@@ -82,6 +82,7 @@ ol.refs li{display:grid;grid-template-columns:36px 1fr;gap:6px;margin:0 0 8px;te
 .live table tbody tr:last-child td{border-bottom:0}
 .bar{display:inline-block;height:10px;background:var(--cool);vertical-align:middle;border-radius:1px}
 .pending{font-size:18px;color:var(--soft);text-align:left}
+.mark{width:22px;height:22px;border-radius:4px;vertical-align:-5px;margin-right:9px}
 .check{font-family:var(--mono);font-size:18px;line-height:1.7;white-space:nowrap;overflow-x:auto;margin:6px 0 0}
 </style>
 </head>
@@ -200,6 +201,7 @@ const n = (v) => v.toLocaleString();
 const f = (v, d = 2) => Number(v).toFixed(d);
 const usd = (v) => (Number(v) / 1e18).toFixed(3);
 const pct = (v, d = 1) => (Number(v) * 100).toFixed(d);
+const mark = (sym) => `<img class="mark" src="./assets/stocks/${sym}.png" alt="" width="22" height="22">${sym}`;
 const ANN = Math.sqrt(78 * 252);
 
 document.querySelectorAll(".tex").forEach((el) => katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false }));
@@ -209,7 +211,7 @@ $("t1").innerHTML = F.feeds.map((x) => {
   const a = x.alpha / 1e18, b = x.beta / 1e18, w = x.omega / 1e18;
   const longRun = Math.sqrt(w / (1 - a - b)) * ANN * 100;
   const half = Math.log(0.5) / Math.log(a + b);
-  return `<tr><td>${x.symbol}</td><td class="n">${f(a, 3)}</td><td class="n">${f(b, 3)}</td><td class="n">${f(a + b, 3)}</td><td class="n">${f(half, 0)} steps</td><td class="n">${f(longRun, 0)}%</td></tr>`;
+  return `<tr><td>${mark(x.symbol)}</td><td class="n">${f(a, 3)}</td><td class="n">${f(b, 3)}</td><td class="n">${f(a + b, 3)}</td><td class="n">${f(half, 0)} steps</td><td class="n">${f(longRun, 0)}%</td></tr>`;
 }).join("");
 
 /* 2. the rhythm estimate against realized */
@@ -243,7 +245,7 @@ $("l-gas1k").textContent = n(Math.round((1024 * slope) / 1e6));
 const gases = F.feeds.map((x) => x.gas), shares = F.feeds.map((x) => x.se / x.asianCall);
 $("t5").innerHTML = F.feeds.map((x) => {
   const vol = Math.sqrt(x.varStep / 1e18) * ANN * 100;
-  return `<tr><td>${x.symbol}</td><td class="n">${f(x.spot / 1e18)}</td><td class="n">${f(vol, 0)}%</td><td class="n">${f(x.threshold / 1e16, 2)}%</td><td class="n">${usd(x.asianCall)} ± ${usd(x.se)}</td><td class="n">${pct(x.se / x.asianCall, 1)}%</td><td class="n dim">${(x.gas / 1e6).toFixed(1)}M</td></tr>`;
+  return `<tr><td>${mark(x.symbol)}</td><td class="n">${f(x.spot / 1e18)}</td><td class="n">${f(vol, 0)}%</td><td class="n">${f(x.threshold / 1e16, 2)}%</td><td class="n">${usd(x.asianCall)} ± ${usd(x.se)}</td><td class="n">${pct(x.se / x.asianCall, 1)}%</td><td class="n dim">${(x.gas / 1e6).toFixed(1)}M</td></tr>`;
 }).join("");
 $("f-block").textContent = n(F.block); $("a-block").textContent = n(F.block);
 $("f-gaslo").textContent = (Math.min(...gases) / 1e6).toFixed(1); $("f-gashi").textContent = (Math.max(...gases) / 1e6).toFixed(1);
@@ -339,8 +341,8 @@ async function refresh(D) {
       const age = Math.max(0, Math.round((Date.now() / 1000 - upd) / 60));
       const ageText = age < 60 ? `${age} min` : age < 2880 ? `${Math.round(age / 60)} h` : `${Math.round(age / 1440)} d`;
       const share = Number(se) / Number(mean);
-      return `<tr><td>${x.symbol}</td><td class="n">${f(Number(spot) / 1e18)}</td><td class="n dim">${ageText}</td><td class="n">${usd(mean)} ± ${usd(se)}</td><td><span class="bar" style="width:${Math.min(120, share * 400).toFixed(0)}px" title="${pct(share)}% of the price"></span></td></tr>`;
-    } catch (e) { return `<tr><td>${x.symbol}</td><td class="n dim" colspan="4">${e.message.slice(0, 60)}</td></tr>`; }
+      return `<tr><td>${mark(x.symbol)}</td><td class="n">${f(Number(spot) / 1e18)}</td><td class="n dim">${ageText}</td><td class="n">${usd(mean)} ± ${usd(se)}</td><td><span class="bar" style="width:${Math.min(120, share * 400).toFixed(0)}px" title="${pct(share)}% of the price"></span></td></tr>`;
+    } catch (e) { return `<tr><td>${mark(x.symbol)}</td><td class="n dim" colspan="4">${e.message.slice(0, 60)}</td></tr>`; }
   }));
   $("live-rows").innerHTML = rows.join("");
   if (nvdaOut) await drawReplay(D, nvdaOut, 4);
@@ -365,7 +367,7 @@ async function drawStrip(D, block) {
     rows.push(`<tr${atm ? ' class="gate"' : ""}><td>${f(Number(w(b)) / 1e18)}</td><td class="n dim">${(STRIP_BPS[j] / 100).toFixed(2)}%</td><td class="n">${usd(w(b + 1))} ± ${usd(w(b + 3))}</td><td class="n">${usd(w(b + 2))} ± ${usd(w(b + 4))}</td></tr>`);
   }
   $("strip-rows").innerHTML = rows.join("");
-  $("strip-cap").textContent = `NVDA option chain from one free call: spot ${f(Number(spot) / 1e18)}, block ${n(block)}, ${count} strikes from ${(STRIP_BPS[0] / 100).toFixed(2)} to ${(STRIP_BPS[count - 1] / 100).toFixed(2)} percent of spot, one session, average price${gas ? `, ${(gas / 1e6).toFixed(1)} million gas` : ""}. Prices in dollars.`;
+  $("strip-cap").innerHTML = `${mark("NVDA")} option chain from one free call: spot ${f(Number(spot) / 1e18)}, block ${n(block)}, ${count} strikes from ${(STRIP_BPS[0] / 100).toFixed(2)} to ${(STRIP_BPS[count - 1] / 100).toFixed(2)} percent of spot, one session, average price${gas ? `, ${(gas / 1e6).toFixed(1)} million gas` : ""}. Prices in dollars.`;
   $("live-strip").hidden = false;
 }
 
