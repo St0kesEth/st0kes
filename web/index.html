@@ -359,7 +359,7 @@ async function drawReplay(D, out, i) {
   const spot = word(out, 2), varStep = word(out, 4), seed = word(out, 5), mean = word(out, 0), se = word(out, 1);
   const r = replay(window.keccak256, { spot, varStep, omega: c.omega, alpha: c.alpha, beta: c.beta, seed, steps: 78, every: 3, paths: 128 });
   const same = r.mean === mean && r.se === se;
-  $("replay-check").innerHTML = `this browser ${wei(r.mean)} ± ${wei(r.se)}<br>the chain    ${wei(mean)} ± ${wei(se)}`.replace(/ {2,}/g, (m) => "&nbsp;".repeat(m.length));
+  $("replay-check").innerHTML = `this browser ${wei(r.mean)} ± ${wei(r.se)}<br>the chain ${wei(mean)} ± ${wei(se)}`;
   $("replay-verdict").textContent = same ? `Seed ${n(Number(seed))}: they match, to the wei.` : `Seed ${n(Number(seed))}: they differ.`;
   const svg = $("fig-replay"), W = 720, H = 380, L = 96, R = 32, T = 22, B = 64;
   const s0 = Number(spot) / 1e18, all = r.series.flat();
