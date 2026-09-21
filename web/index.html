@@ -25,8 +25,9 @@ body{margin:0;background:#fff;color:var(--ink);font-family:var(--serif);
 a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
 :focus-visible{outline:2px solid var(--link);outline-offset:2px}
 .sheet{max-width:680px;margin:0 auto;padding:72px 24px 120px}
-.corner{position:absolute;top:26px;right:28px;font-family:var(--mono);font-size:18px;color:var(--soft);text-decoration:none}
-.corner:hover{color:var(--link);text-decoration:none}
+.corner{position:absolute;top:26px;right:28px;display:flex;gap:22px;font-family:var(--mono);font-size:18px}
+.corner a{color:var(--soft);text-decoration:none}
+.corner a:hover{color:var(--link);text-decoration:none}
 
 .running{font-family:var(--mono);font-size:18px;color:var(--soft);display:flex;
   justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:56px}
@@ -84,7 +85,7 @@ ol.refs li{display:grid;grid-template-columns:36px 1fr;gap:6px;margin:0 0 8px;te
 </style>
 </head>
 <body>
-<a class="corner" href="https://github.com/St0kesEth/st0kes" aria-label="Repository on GitHub">GitHub ↗</a>
+<div class="corner"><a href="https://github.com/St0kesEth/st0kes" aria-label="Repository on GitHub">GitHub ↗</a><a href="https://x.com/St0kesdotblog" aria-label="St0kes on X">X ↗</a></div>
 <main class="sheet">
 
   <a href="./assets/logo.png" class="logo-link" aria-label="St0kes logo">
