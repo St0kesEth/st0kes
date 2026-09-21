@@ -168,7 +168,7 @@ ol.refs li{display:grid;grid-template-columns:36px 1fr;gap:6px;margin:0 0 8px;te
     <div id="live-strip-spcx" hidden>
       <p class="tcap"><b>Table 7.</b> <span id="strip-cap-spcx">SpaceX option chain from one free call.</span></p>
       <div class="tw"><table><thead><tr><th>strike</th><th class="n">of spot</th><th class="n">call ± error</th><th class="n">put ± error</th></tr></thead><tbody id="strip-rows-spcx"></tbody></table></div>
-      <p class="pending" id="strip-note-spcx">SpaceX listed on 12 June 2026, so it has a shorter history than the other nine: its variance memory is fitted on five-minute bars since the listing (<code>tools/spacex.py</code>), where the nine were fitted on the window of [2]. Everything else is the same call.</p>
+      <p class="pending" id="strip-note-spcx">SpaceX listed on 12 June 2026 and its feed publishes on movement like the other nine, so the same call prices it. Its variance memory is fitted by <code>tools/spacex.py</code> on 4,681 five-minute bars, the same window length the nine of [2] were fitted on, and came out at alpha 0.23 and beta 0.73.</p>
     </div>
     <p class="pending" id="live-note">Seed is the block number, so the estimate is drawn afresh each time and moves inside its own error bar. Refreshed every minute; the panel stops when the tab is hidden. Outside the trading session the feed age is measured in hours because the feed itself is quiet.</p>
   </div>
