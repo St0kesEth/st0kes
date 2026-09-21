@@ -3,6 +3,8 @@
 A Monte Carlo option engine that runs inside a view call and returns the
 standard error of its own estimate with the price.
 
+CA: 0x1390d4e06126082ce98a9fc7ac9cea38507f3ee6
+
 - `src/Engine.sol`: the walk (a variance that feeds on itself, GARCH(1,1);
   Brownian when alpha and beta are zero), four payoffs (call, put,
   average-price call and put), and the error bar. Stateless, pure.
