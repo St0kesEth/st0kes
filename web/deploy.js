@@ -10,14 +10,14 @@ export default {
   "stripLive": "0x1747b898a55b528D7a5f541F2B70dd589B682250",
   "stripBlock": "0x419503f",
   "stripDeployedAt": "2026-09-21T11:39:44Z",
-  "stripLiveSpaceX": "0x02dCDf4f3f1a1c27fD29968B090FC5e0517E8790",
-  "stripLiveSpaceXBlock": "0x41fc444",
-  "stripLiveSpaceXDeployedAt": "2026-09-21T23:26:53Z",
+  "stripLiveSpaceX": "0x379B0fBD58f0a3A0E5a903cA4421A0059Ec189cD",
+  "stripLiveSpaceXBlock": "0x41fdec2",
+  "stripLiveSpaceXDeployedAt": "2026-09-21T23:38:15Z",
   "txs": [
     {
       "name": "StripLive (with SpaceX)",
-      "hash": "0x0f418e7af6074ac7634004f46cd2f12ef14441c3f766c60a2d2aaae14f79c130",
-      "gas": "0x22b97b"
+      "hash": "0xa30e1f137a0a261857ce606e019fe2a7b1ad0b1d5fe2d1fff4e3008b8ffbe833",
+      "gas": "0x235583"
     },
     {
       "name": "StripEngine",

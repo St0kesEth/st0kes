@@ -1,0 +1,20 @@
+{
+ "source": "GARCH(1,1) fit on five-minute bars since the listing, the fitter of the intermittency paper",
+ "bars": 4681,
+ "firstBar": 1782480600,
+ "lastBar": 1790020800,
+ "returns": 4621,
+ "sourceSha256": "5eef646497deb8889c1c3f156ee6914a02686cb396009cbedbe5ef70b237271a",
+ "units": {
+  "omega": "percent squared per five-minute bar",
+  "alpha": "1",
+  "beta": "1"
+ },
+ "fit": {
+  "omega": 0.009228590808549052,
+  "alpha": 0.23239364880632182,
+  "beta": 0.7299566659997757,
+  "halfLifeBars": 18.061647353532127,
+  "longRunAnnualVolPct": 69.41200543655285
+ }
+}
