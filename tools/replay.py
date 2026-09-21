@@ -48,7 +48,7 @@ def root(x):            # sqrt of a 1e18 fixed-point number, exact Babylonian
     return isqrt(x * ONE) if x else 0
 
 
-def warm(x, guess):     # five Newton passes from the previous step's root
+def warm(x, guess):     # original arithmetic for the archived web/fork.js fixture
     if x == 0:
         return 0
     n, y = x * ONE, (guess or x)

@@ -1,0 +1,14 @@
+{
+  "atmCall": 912342326517072460,
+  "atmSe": 95068952008213581,
+  "block": 67367297,
+  "blockTimestamp": 1789849559,
+  "execution": "new contracts executed locally on a historical chain fork; not deployed to mainnet",
+  "feedUpdatedAt": 1789761332,
+  "gas": 30060522,
+  "paths": 128,
+  "prices": 64,
+  "seed": 1,
+  "spot": "222447298490000000000",
+  "varStep": 3154648347543
+}

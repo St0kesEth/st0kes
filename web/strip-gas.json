@@ -1,0 +1,15 @@
+{
+  "independentPairs": 64,
+  "ordinaryAtmCall": 390468626417409459,
+  "ordinaryAtmSe": 52981267877887428,
+  "ordinaryStripGas": 42616601,
+  "pairedAtmCall": 402177712708159767,
+  "pairedAtmSe": 40651700561319444,
+  "pairedStripGas": 29205723,
+  "paths": 128,
+  "prices": 64,
+  "scalar64Gas": 2239823292,
+  "singleAtmCallGas": 35000744,
+  "steps": 78,
+  "strikes": 32
+}

@@ -31,12 +31,43 @@ MIT.
 
 
 
+
+## A strike strip from one set of paths
+
+`StripEngine` prices calls and puts at up to 32 strikes, each with its Monte
+Carlo standard error, from one set of paths, because the expensive part of a
+quote is walking the paths and every strike can reuse them. In paired mode the
+128 paths are walked as 64 mirrored pairs that share one variance walk, and the
+error is computed across the pairs, since a pair is one independent draw.
+`StripLive` binds the strip to one feed snapshot and returns the block, the
+seed and the feed timestamp with it.
+
+In the reference benchmark (128 paths, 78 steps, 32 strikes) the 64 paired
+prices cost 29,205,723 gas; one scalar at-the-money call costs 35,000,744 and
+64 scalar prices would cost 2,239,823,292. The study behind it keeps all 13
+profiles, 256 seeds, 3 strikes and both sides, including the four cases where
+pairing did not lower the variance (`web/strip-study-*.json`).
+
+`StripEngine` inherits `EngineV2`, which is the deployed engine's walk with a
+square root that is exact from any starting guess. The deployed `Engine` is
+left exactly as it is on the chain, and `tools/replay.py` and `web/fork.js`
+reproduce it to the wei.
+
+```sh
+forge test --match-contract 'Strip(EngineTest|Benchmark|Study|LiveTest|ReplayTest)' --fuzz-runs 256 -vv
+python3 tools/analyze_strip.py
+python3 tools/replay_strip.py
+forge test --match-contract StripLiveForkTest -vv
+```
+
 ## Live on Robinhood Chain
 
 Deployed to Robinhood Chain (chain id 4663) and source-verified on Sourcify.
 
 - Engine: `0x29381810B485566206e216a8aC4De8F963C0cEAf` ([Sourcify](https://sourcify.dev/#/lookup/0x29381810B485566206e216a8aC4De8F963C0cEAf))
 - Live:   `0xEC637733bE276dB2ab3D82Fc1830b2128B430e13` ([Sourcify](https://sourcify.dev/#/lookup/0xEC637733bE276dB2ab3D82Fc1830b2128B430e13))
+- StripEngine: `0x754F761B639996E2E315d17D25a43710c50eba23` ([Sourcify](https://sourcify.dev/#/lookup/0x754F761B639996E2E315d17D25a43710c50eba23))
+- StripLive:   `0x1747b898a55b528D7a5f541F2B70dd589B682250` ([Sourcify](https://sourcify.dev/#/lookup/0x1747b898a55b528D7a5f541F2B70dd589B682250))
 
 The nine at-the-money one-session average-price calls from the paper, live from
 the chain (NVDA is index 4):
